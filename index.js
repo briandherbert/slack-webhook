@@ -26,7 +26,7 @@ app.post('/', function(req, res) {
 
 
     if (query.length > 0) {
-        build_command(textWithoutTriggerWord, req, res);
+        build_command(query, req, res);
     } else {
         usage_help(res, req.body.text);
     }
