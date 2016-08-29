@@ -7,6 +7,6 @@
   "env": {
     "SLACK_TOKEN": {
       "description": "The Slack slash command Token"
-    },
+    }
   }
 }
