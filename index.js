@@ -18,7 +18,8 @@ app.post('/', function(req, res) {
         return res.status(401).send('Invalid token');
     }
 
-    var query = req.body.text.replace(new RegExp("^giff"), '').trim();
+    var isAnimated = req.body.text.indexOf(giff) == 0;
+    var query = req.body.text.replace(new RegExp("^(giff|picof)"), '').trim();
 
     query = encodeURIComponent(query);
 
@@ -26,7 +27,7 @@ app.post('/', function(req, res) {
 
 
     if (query.length > 0) {
-        build_command(query, req, res);
+        build_command(query, isAnimated, req, res);
     } else {
         usage_help(res, req.body.text);
     }
@@ -39,7 +40,7 @@ app.listen(process.env.PORT || 3000, function() {
 
 function usage_help(res, fullquery) {
     res.send(JSON.stringify({
-        text: "Type a phrase after 'giff':\n" +
+        text: "Type a phrase after 'giff' for an animation, or 'picof' for a still image:\n" +
             "```\n" +
             "giff winning\n" +
             "```"
@@ -47,23 +48,23 @@ function usage_help(res, fullquery) {
     }));
 }
 
-function build_command(text, req, res) {
+function build_command(text, isAnimated, req, res) {
 
     console.log("Find gif " + text);
 
-    getGif(res, text, "puns", function(imgUrl) {
+    getGif(res, text, isAnimated, function(imgUrl) {
         console.log("Got url " + imgUrl);
         return res.send(JSON.stringify({ text: "" + imgUrl }));
     });
 }
 
-function getGif(response, query, channel, callback) {
+function getGif(response, query, animated, callback) {
   console.log("get gif " + query + " for channel " + channel);
 
     var options = {
         host: 'www.bing.com',
         port: 80,
-        path: '/images/search?q=' + query + '+filterui:photo-animatedgif+filterui:imagesize-medium'
+        path: '/images/search?q=' + query + (animated ? '+filterui:photo-animatedgif' : '') + 'filterui:imagesize-medium'
     };
 
 
