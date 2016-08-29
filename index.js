@@ -16,7 +16,9 @@ app.post('/', function(req, res) {
         return res.status(401).send('Invalid token');
     }
 
-    var textWithoutTriggerWord = req.body.text.replace(new RegExp("^" + escapeRegExp(req.body.trigger_word)), '').trim();
+    var textWithoutTriggerWord = req.body.text.replace(new RegExp("^giff"), '').trim();
+
+    console.log("text without trigger " + textWithoutTriggerWord);
 
     if (textWithoutTriggerWord.length > 0) {
         build_command(textWithoutTriggerWord, req, res);
