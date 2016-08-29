@@ -31,6 +31,7 @@ app.listen(process.env.PORT || 3000, function() {
     console.log('Express listening on port', this.address().port);
 });
 
+
 function usage_help(res, fullquery) {
     res.send(JSON.stringify({
         text: "Type a phrase after 'giff':\n" +
