@@ -1,26 +1,12 @@
 {
-  "name": "Buildkite Slack Slash Command",
-  "description": "An example Slack slash command for Buildkite",
+  "name": "Giffinder",
+  "description": "Alternate gif finder",
   "keywords": [
-    "ci",
-    "buildkite",
-    "slack",
-    "nodejs",
-    "chat",
-    "chatops"
+    "gif"
   ],
-  "website": "https://buildkite.com/",
-  "repository": "https://github.com/buildkite/slack-slash-command",
-  "logo": "http://i.imgur.com/JDjeaCq.jpg",
   "env": {
     "SLACK_TOKEN": {
       "description": "The Slack slash command Token"
     },
-    "BUILDKITE_API_TOKEN": {
-      "description": "A Buildkite API token with write_builds permission"
-    },
-    "BUILDKITE_DEFAULT_ORG_SLUG": {
-      "description": "The default slug of your Buildkite organization to use for projects"
-    }
   }
 }
