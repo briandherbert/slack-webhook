@@ -18,7 +18,7 @@ app.post('/', function(req, res) {
         return res.status(401).send('Invalid token');
     }
 
-    var isAnimated = req.body.text.indexOf(giff) == 0;
+    var isAnimated = req.body.text.indexOf('giff') == 0;
     var query = req.body.text.replace(new RegExp("^(giff|picof)"), '').trim();
 
     query = encodeURIComponent(query);
