@@ -23,7 +23,7 @@ app.post('/', function(req, res) {
     if (textWithoutTriggerWord.length > 0) {
         build_command(textWithoutTriggerWord, req, res);
     } else {
-        usage_help(res);
+        usage_help(res, req.body.text);
     }
 });
 
@@ -31,11 +31,11 @@ app.listen(process.env.PORT || 3000, function() {
     console.log('Express listening on port', this.address().port);
 });
 
-function usage_help(res) {
+function usage_help(res, fullquery) {
     res.send(JSON.stringify({
         text: "Type a phrase after 'giff':\n" +
             "```\n" +
-            "giff facepalm\n" +
+            "giff facepalm\n" + "you searched " + fullquery
             "```"
             // Add your own command help here
     }));
