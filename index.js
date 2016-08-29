@@ -18,10 +18,8 @@ app.post('/', function(req, res) {
 
     var textWithoutTriggerWord = req.body.text.replace(new RegExp("^" + escapeRegExp(req.body.trigger_word)), '').trim();
 
-    if (textWithoutTriggerWord.match(/^build/)) {
+    if (textWithoutTriggerWord.length > 0) {
         build_command(textWithoutTriggerWord, req, res);
-    } else if (textWithoutTriggerWord.match(/^mycommand/)) {
-        // Add your own commands here
     } else {
         usage_help(res);
     }
