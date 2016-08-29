@@ -5,6 +5,8 @@ var http = require('http');
 var express = require('express');
 var bodyParser = require('body-parser');
 
+var bingKeyword = 'a class="thumb" target="_blank" href="';
+
 var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 
