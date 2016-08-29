@@ -18,11 +18,14 @@ app.post('/', function(req, res) {
         return res.status(401).send('Invalid token');
     }
 
-    var textWithoutTriggerWord = req.body.text.replace(new RegExp("^giff"), '').trim();
+    var query = req.body.text.replace(new RegExp("^giff"), '').trim();
 
-    console.log("text without trigger " + textWithoutTriggerWord);
+    query = encodeURIComponent(query);
 
-    if (textWithoutTriggerWord.length > 0) {
+    console.log("text without trigger " + query);
+
+
+    if (query.length > 0) {
         build_command(textWithoutTriggerWord, req, res);
     } else {
         usage_help(res, req.body.text);
