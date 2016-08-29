@@ -46,7 +46,7 @@ function build_command(text, req, res) {
 
     console.log("Find gif " + text);
 
-    findGif(res, text, "puns", function(imgUrl) {
+    getGif(res, text, "puns", function(imgUrl) {
         console.log("Got url " + imgUrl);
         return res.send(JSON.stringify({ text: ":package: Here you go: " + imgUrl }));
     });
