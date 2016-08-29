@@ -36,7 +36,7 @@ function usage_help(res, fullquery) {
     res.send(JSON.stringify({
         text: "Type a phrase after 'giff':\n" +
             "```\n" +
-            "giff facepalm\n" + "you searched " + fullquery
+            "giff facepalm\n" + "you searched " + fullquery +
             "```"
             // Add your own command help here
     }));
