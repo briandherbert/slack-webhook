@@ -64,7 +64,7 @@ function getGif(response, query, animated, callback) {
     var options = {
         host: 'www.bing.com',
         port: 80,
-        path: '/images/search?q=' + query + (animated ? '+filterui:photo-animatedgif' : '') + 'filterui:imagesize-medium'
+        path: '/images/search?q=' + query + (animated ? '+filterui:photo-animatedgif' : '') + '+filterui:imagesize-medium'
     };
 
 
