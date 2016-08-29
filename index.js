@@ -59,7 +59,7 @@ function build_command(text, isAnimated, req, res) {
 }
 
 function getGif(response, query, animated, callback) {
-  console.log("get gif " + query + " for channel " + channel);
+  console.log("get gif " + query + " animated? " + animated);
 
     var options = {
         host: 'www.bing.com',
