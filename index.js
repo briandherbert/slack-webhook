@@ -1,114 +1,102 @@
 // Expected env settings
 var slack_token = process.env.SLACK_TOKEN;
-var buildkite_api_token = process.env.BUILDKITE_API_TOKEN;
-var buildkite_default_org_slug  = process.env.BUILDKITE_DEFAULT_ORG_SLUG;
 
-var https      = require('https');
-var express    = require('express');
+var https = require('https');
+var express = require('express');
 var bodyParser = require('body-parser');
 
 var app = express();
 app.use(bodyParser.urlencoded());
 
-app.post('/', function(req, res){
-  console.log('Received POST', req.headers, req.body);
+app.post('/', function(req, res) {
+    console.log('Received POST', req.headers, req.body);
 
-  if (req.body.token != slack_token) {
-    console.log("Invalid Slack token");
-    return res.status(401).send('Invalid token');
-  }
+    if (req.body.token != slack_token) {
+        console.log("Invalid Slack token");
+        return res.status(401).send('Invalid token');
+    }
 
-  var textWithoutTriggerWord = req.body.text.replace(new RegExp("^" + escapeRegExp(req.body.trigger_word)), '').trim();
+    var textWithoutTriggerWord = req.body.text.replace(new RegExp("^" + escapeRegExp(req.body.trigger_word)), '').trim();
 
-  if (textWithoutTriggerWord.match(/^build/)) {
-    build_command(textWithoutTriggerWord, req, res);
-  } else if (textWithoutTriggerWord.match(/^mycommand/)) {
-    // Add your own commands here
-  } else {
-    usage_help(res);
-  }
+    if (textWithoutTriggerWord.match(/^build/)) {
+        build_command(textWithoutTriggerWord, req, res);
+    } else if (textWithoutTriggerWord.match(/^mycommand/)) {
+        // Add your own commands here
+    } else {
+        usage_help(res);
+    }
 });
 
 app.listen(process.env.PORT || 3000, function() {
-  console.log('Express listening on port', this.address().port);
+    console.log('Express listening on port', this.address().port);
 });
 
 function usage_help(res) {
-  res.send(JSON.stringify({
-    text: "Available commands:\n" +
-      "```\n" +
-       "build <project> \"<message>\" <branch default:master> <commit default:HEAD>\n" +
-       "Example: build spacex/rockets \"Building from Slack\"\n" +
-      "```"
-      // Add your own command help here
-  }));
+    res.send(JSON.stringify({
+        text: "Type a phrase after 'giff':\n" +
+            "```\n" +
+            "giff facepalm\n" +
+            "```"
+            // Add your own command help here
+    }));
 }
 
 function build_command(text, req, res) {
-  var buildCommandMatch = text.match(/^build (.*?) ["“](.*?)["”](?: ([^ ]+))?(?: ([^ ]+))?/);
-  if (!buildCommandMatch) return usage_help(res);
 
-  var orgProjMatch = buildCommandMatch[1].match(/(.*)\/(.*)/);
-  if (orgProjMatch) {
-    var org = orgProjMatch[1];
-    var project = orgProjMatch[2];
-  } else {
-    var org = buildkite_default_org_slug;
-    var project = buildCommandMatch[1];
-  }
+    console.log("Find gif " + text);
 
-  var message = buildCommandMatch[2];
-  var branch = buildCommandMatch[3] || "master";
-  var commit = buildCommandMatch[4] || "HEAD";
-
-  console.log("Build command", buildCommandMatch, org, project, message);
-
-  post_to_buildkite('/v1/organizations/' + org + '/projects/' + project + '/builds', {
-    branch: branch,
-    commit: commit,
-    message: message
-  }, function(responseCode, responseBody) {
-    console.log("Build API response", responseCode, responseBody)
-    if (responseCode >= 300) {
-      return res.send(JSON.stringify({text: "Buildkite API failed: " + responseCode + " " + responseBody}));
-    } else {
-      var responseJson = JSON.parse(responseBody);
-      return res.send(JSON.stringify({text: ":package: Here you go @" + req.body.user_name + ": " + responseJson.web_url}));
-    }
-  });
+    findGif(res, text, "puns", function(imgUrl) {
+        console.log("Got url " + imgUrl);
+        return res.send(JSON.stringify({ text: ":package: Here you go: " + imgUrl }));
+    });
 }
 
-function post_to_buildkite(path, params, callback) {
-  var body = JSON.stringify(params);
+function getGif(response, query, channel, callback) {
+  console.log("get gif " + query + " for channel " + channel);
 
-  console.log("Posting to Buildkite", path, body);
+    var options = {
+        host: 'www.bing.com',
+        port: 80,
+        path: '/images/search?q=' + query + '+filterui:photo-animatedgif'
+    };
 
-  var req = https.request({
-    hostname: 'api.buildkite.com',
-    port: 443,
-    path: path,
-    method: 'POST',
-    headers: {
-      "Content-type":   "application/json",
-      "Connection":     "close",
-      "Content-length": body.length,
-      "Authorization":  "Bearer " + buildkite_api_token,
-    }
-  }, function(res) {
-    var body = "";
-    res.on("data", function(data) {
-      body += data.toString();
+
+    var req = http.request(options, function(res) {
+        var body = "unset";
+
+        res.setEncoding('utf8');
+        res.on('data', function(chunk) {
+            body += chunk;
+            //console.log("chunk " + chunk);
+        });
+
+        res.on('end', function() {
+            //console.log('body: ' + body);
+
+            var idx = body.indexOf(bingKeyword);
+
+            if (idx > 0 && idx < body.length - 20) {
+              idx += bingKeyword.length;
+              var idxEnd = body.indexOf('"', idx + 1);
+
+              if (idxEnd > 0 && idxEnd < body.length) {
+                var imgUrl = body.substring(idx, idxEnd);
+                console.log("found url " + imgUrl);
+                //post("puns", imgUrl);
+                callback(imgUrl);
+              }
+            }
+        });
+
+        req.on('error', function(e) {
+            console.log("error" + e.message);
+        });
     });
-    res.on("end", function() {
-      console.log("Buildkite API response", res.statusCode, body);
-      callback(res.statusCode, body);
-    });
-  });
 
-  req.write(body);
-  req.end();
+    req.end();
 }
 
-function escapeRegExp(string){
-  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
