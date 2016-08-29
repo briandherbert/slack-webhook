@@ -1,7 +1,7 @@
 // Expected env settings
 var slack_token = process.env.SLACK_TOKEN;
 
-var https = require('https');
+var http = require('http');
 var express = require('express');
 var bodyParser = require('body-parser');
 
